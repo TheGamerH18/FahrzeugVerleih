@@ -28,7 +28,7 @@ class Mietvertrag:
     def read(connection, MietvertragID):
         cursor = connection.cursor()
         sql = "SELECT * FROM Mietverträge WHERE MietvertragID = %s"
-        val = (MietvertragID,)
+        val = MietvertragID
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:
@@ -47,6 +47,6 @@ class Mietvertrag:
     def delete(self, connection):
         cursor = connection.cursor()
         sql = "DELETE FROM Mietverträge WHERE MietvertragID = %s"
-        val = (self.MietvertragID,)
+        val = self.MietvertragID
         cursor.execute(sql, val)
         connection.commit()

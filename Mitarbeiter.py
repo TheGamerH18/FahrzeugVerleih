@@ -1,5 +1,6 @@
 import mysql.connector
 
+
 class Mitarbeiter:
     def __init__(self, MitarbeiterID, Vorname, Nachname):
         self.MitarbeiterID = MitarbeiterID
@@ -19,7 +20,7 @@ class Mitarbeiter:
     def read(connection, MitarbeiterID):
         cursor = connection.cursor()
         sql = "SELECT * FROM Mitarbeiter WHERE MitarbeiterID = %s"
-        val = (MitarbeiterID,)
+        val = MitarbeiterID
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:
@@ -37,6 +38,6 @@ class Mitarbeiter:
     def delete(self, connection):
         cursor = connection.cursor()
         sql = "DELETE FROM Mitarbeiter WHERE MitarbeiterID = %s"
-        val = (self.MitarbeiterID,)
+        val = self.MitarbeiterID
         cursor.execute(sql, val)
         connection.commit()

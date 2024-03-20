@@ -19,7 +19,7 @@ class Inspektion:
     def read(connection, InspektionID):
         cursor = connection.cursor()
         sql = "SELECT * FROM Inspektionen WHERE InspektionID = %s"
-        val = (InspektionID,)
+        val = InspektionID
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:
@@ -37,6 +37,6 @@ class Inspektion:
     def delete(self, connection):
         cursor = connection.cursor()
         sql = "DELETE FROM Inspektionen WHERE InspektionID = %s"
-        val = (self.InspektionID,)
+        val = self.InspektionID
         cursor.execute(sql, val)
         connection.commit()

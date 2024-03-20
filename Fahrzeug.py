@@ -23,7 +23,7 @@ class Fahrzeug:
     def read(connection, FahrzeugID):
         cursor = connection.cursor()
         sql = "SELECT * FROM Fahrzeuge WHERE FahrzeugID = %s"
-        val = (FahrzeugID,)
+        val = FahrzeugID
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:
@@ -41,6 +41,6 @@ class Fahrzeug:
     def delete(self, connection):
         cursor = connection.cursor()
         sql = "DELETE FROM Fahrzeuge WHERE FahrzeugID = %s"
-        val = (self.FahrzeugID,)
+        val = self.FahrzeugID
         cursor.execute(sql, val)
         connection.commit()
