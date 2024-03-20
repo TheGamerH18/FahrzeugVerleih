@@ -41,3 +41,14 @@ class Inspektion:
         val = self.InspektionID
         cursor.execute(sql, val)
         connection.commit()
+
+    @staticmethod
+    def get_all(connection):
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Inspektionen")
+        results = cursor.fetchall()
+        inspektionen = []
+        for row in results:
+            inspektion = Inspektion(*row)
+            inspektionen.append(inspektion)
+        return inspektionen

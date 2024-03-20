@@ -19,6 +19,16 @@ class Fahrzeug:
         connection.commit()
         return cursor.lastrowid
 
+    def get_all(connection):
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Fahrzeuge")
+        results = cursor.fetchall()
+        fahrzeuge = []
+        for row in results:
+            fahrzeug = Fahrzeug(*row)
+            fahrzeuge.append(fahrzeug)
+        return fahrzeuge
+
     @staticmethod
     def read(connection, FahrzeugID):
         cursor = connection.cursor()

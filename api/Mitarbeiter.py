@@ -41,3 +41,14 @@ class Mitarbeiter:
         val = self.MitarbeiterID
         cursor.execute(sql, val)
         connection.commit()
+
+    @staticmethod
+    def get_all(connection):
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Mitarbeiter")
+        results = cursor.fetchall()
+        mitarbeiter = []
+        for row in results:
+            m = Mitarbeiter(*row)
+            mitarbeiter.append(m)
+        return mitarbeiter

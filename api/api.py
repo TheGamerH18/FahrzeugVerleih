@@ -7,6 +7,9 @@ import mysql.connector
 
 app = Flask(__name__)
 
+# Define your API key
+API_KEY = 'your_api_key_here'
+
 # MySQL connection parameters
 db_config = {
     'host': 'localhost',
@@ -18,15 +21,25 @@ db_config = {
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
-@app.route('/fahrzeuge', methods=['POST'])
-def create_fahrzeug():
-    data = request.get_json()
+# Authentication decorator
+def requires_auth(f):
+    def decorated(*args, **kwargs):
+        api_key = request.headers.get('X-API-KEY')
+        if not api_key or api_key != API_KEY:
+            return jsonify({'error': 'Unauthorized access'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+@app.route('/fahrzeuge', methods=['GET'])
+@requires_auth
+def get_all_fahrzeuge():
     connection = get_db_connection()
-    fahrzeug_id = Fahrzeug.create(connection, **data)
+    fahrzeuge = Fahrzeug.get_all(connection)
     connection.close()
-    return jsonify({'FahrzeugID': fahrzeug_id}), 201
+    return jsonify([f.__dict__ for f in fahrzeuge])
 
 @app.route('/fahrzeuge/<int:fahrzeug_id>', methods=['GET'])
+@requires_auth
 def get_fahrzeug(fahrzeug_id):
     connection = get_db_connection()
     fahrzeug = Fahrzeug.read(connection, fahrzeug_id)
@@ -36,15 +49,16 @@ def get_fahrzeug(fahrzeug_id):
     else:
         return jsonify({'error': 'Fahrzeug not found'}), 404
 
-@app.route('/inspektionen', methods=['POST'])
-def create_inspektion():
-    data = request.get_json()
+@app.route('/inspektionen', methods=['GET'])
+@requires_auth
+def get_all_inspektionen():
     connection = get_db_connection()
-    inspektion_id = Inspektion.create(connection, **data)
+    inspektionen = Inspektion.get_all(connection)
     connection.close()
-    return jsonify({'InspektionID': inspektion_id}), 201
+    return jsonify([i.__dict__ for i in inspektionen])
 
 @app.route('/inspektionen/<int:inspektion_id>', methods=['GET'])
+@requires_auth
 def get_inspektion(inspektion_id):
     connection = get_db_connection()
     inspektion = Inspektion.read(connection, inspektion_id)
@@ -54,15 +68,16 @@ def get_inspektion(inspektion_id):
     else:
         return jsonify({'error': 'Inspektion not found'}), 404
 
-@app.route('/mietvertraege', methods=['POST'])
-def create_mietvertrag():
-    data = request.get_json()
+@app.route('/mietvertraege', methods=['GET'])
+@requires_auth
+def get_all_mietvertraege():
     connection = get_db_connection()
-    mietvertrag_id = Mietvertrag.create(connection, **data)
+    mietvertraege = Mietvertrag.get_all(connection)
     connection.close()
-    return jsonify({'MietvertragID': mietvertrag_id}), 201
+    return jsonify([m.__dict__ for m in mietvertraege])
 
 @app.route('/mietvertraege/<int:mietvertrag_id>', methods=['GET'])
+@requires_auth
 def get_mietvertrag(mietvertrag_id):
     connection = get_db_connection()
     mietvertrag = Mietvertrag.read(connection, mietvertrag_id)
@@ -72,15 +87,16 @@ def get_mietvertrag(mietvertrag_id):
     else:
         return jsonify({'error': 'Mietvertrag not found'}), 404
 
-@app.route('/mitarbeiter', methods=['POST'])
-def create_mitarbeiter():
-    data = request.get_json()
+@app.route('/mitarbeiter', methods=['GET'])
+@requires_auth
+def get_all_mitarbeiter():
     connection = get_db_connection()
-    mitarbeiter_id = Mitarbeiter.create(connection, **data)
+    mitarbeiter = Mitarbeiter.get_all(connection)
     connection.close()
-    return jsonify({'MitarbeiterID': mitarbeiter_id}), 201
+    return jsonify([m.__dict__ for m in mitarbeiter])
 
 @app.route('/mitarbeiter/<int:mitarbeiter_id>', methods=['GET'])
+@requires_auth
 def get_mitarbeiter(mitarbeiter_id):
     connection = get_db_connection()
     mitarbeiter = Mitarbeiter.read(connection, mitarbeiter_id)

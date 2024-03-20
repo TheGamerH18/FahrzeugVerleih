@@ -50,3 +50,14 @@ class Mietvertrag:
         val = self.MietvertragID
         cursor.execute(sql, val)
         connection.commit()
+
+    @staticmethod
+    def get_all(connection):
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM Mietverträge")
+        results = cursor.fetchall()
+        mietvertraege = []
+        for row in results:
+            mietvertrag = Mietvertrag(*row)
+            mietvertraege.append(mietvertrag)
+        return mietvertraege
