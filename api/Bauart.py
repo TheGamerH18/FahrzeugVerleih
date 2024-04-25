@@ -1,11 +1,26 @@
 import mysql.connector
 
 class Bauart:
-    def __init__(self, BauartId, Marke, Modell, Bauform):
+    def __init__(self, BauartId: int, Marke: str, Modell: str, Bauform: str):
         self.BauartId = BauartId
         self.Marke = Marke
         self.Modell = Modell
         self.Bauform = Bauform
+
+    def update(self, connection):
+        cursor = connection.cursor()
+        sql = "UPDATE Bauart SET Marke = %s, Modell = %s, Bauform = %s WHERE BauartId = %s"
+        val = (self.Marke, self.Modell, self.Bauform, self.BauartId)
+        cursor.execute(sql, val)
+        connection.commit()
+
+
+    def delete(self, connection):
+        cursor = connection.cursor()
+        sql = "DELETE FROM Bauart WHERE BauartId = %s"
+        val = self.BauartId
+        cursor.execute(sql, val)
+        connection.commit()
 
     @staticmethod
     def create(connection, Marke, Modell, Bauform):
