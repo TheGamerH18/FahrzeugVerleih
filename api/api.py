@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, request, jsonify
 from functools import wraps
 from MietObjekt import MietObjekt
@@ -5,18 +7,19 @@ from Inspektion import Inspektion
 from MietVorgang import MietVorgang
 from Mitarbeiter import Mitarbeiter
 import mysql.connector
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-
+load_dotenv()
 # Define your API key
-API_KEY = 'b'
+API_KEY = os.getenv('API_KEY')
 
 # MySQL connection parameters
 db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'qwertz',
-    'database': 'ausleihen_fahrzeuge'
+    'host': os.getenv('DB_HOST'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASS'),
+    'database': os.getenv('DB_DATABASE'),
 }
 
 
