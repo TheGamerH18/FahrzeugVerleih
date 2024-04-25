@@ -1,3 +1,5 @@
+#CREATE DATABASE ausleihen_fahrzeuge;
+
 CREATE TABLE IF NOT EXISTS Bauart (
     BauartID INT NOT NULL AUTO_INCREMENT,
     Marke VARCHAR(255),

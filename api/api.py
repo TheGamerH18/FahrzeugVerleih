@@ -1,21 +1,22 @@
 from flask import Flask, request, jsonify
-from fahrzeug import Fahrzeug
-from inspektion import Inspektion
-from mietvertrag import Mietvertrag
-from mitarbeiter import Mitarbeiter
+from functools import wraps
+from MietObjekt import MietObjekt
+from Inspektion import Inspektion
+from MietVorgang import MietVorgang
+from Mitarbeiter import Mitarbeiter
 import mysql.connector
 
 app = Flask(__name__)
 
 # Define your API key
-API_KEY = 'your_api_key_here'
+API_KEY = 'b'
 
 # MySQL connection parameters
 db_config = {
     'host': 'localhost',
-    'user': 'your_username',
-    'password': 'your_password',
-    'database': 'your_database'
+    'user': 'root',
+    'password': 'qwertz',
+    'database': 'ausleihen_fahrzeuge'
 }
 
 
@@ -25,20 +26,19 @@ def get_db_connection():
 
 # Authentication decorator
 def requires_auth(f):
+    @wraps(f)
     def decorated(*args, **kwargs):
-        api_key = request.headers.get('X-API-KEY')
+        api_key = request.args.get('X-API-KEY')
         if not api_key or api_key != API_KEY:
             return jsonify({'error': 'Unauthorized access'}), 401
         return f(*args, **kwargs)
-
     return decorated
-
 
 @app.route('/fahrzeuge', methods=['GET'])
 @requires_auth
 def get_all_fahrzeuge():
     connection = get_db_connection()
-    fahrzeuge = Fahrzeug.get_all(connection)
+    fahrzeuge = MietObjekt.get_all(connection)
     connection.close()
     return jsonify([f.__dict__ for f in fahrzeuge])
 
@@ -47,7 +47,7 @@ def get_all_fahrzeuge():
 @requires_auth
 def get_fahrzeug(fahrzeug_id):
     connection = get_db_connection()
-    fahrzeug = Fahrzeug.read(connection, fahrzeug_id)
+    fahrzeug = MietObjekt.read(connection, fahrzeug_id)
     connection.close()
     if fahrzeug:
         return jsonify(fahrzeug.__dict__)
@@ -80,7 +80,7 @@ def get_inspektion(inspektion_id):
 @requires_auth
 def get_all_mietvertraege():
     connection = get_db_connection()
-    mietvertraege = Mietvertrag.get_all(connection)
+    mietvertraege = MietVorgang.get_all(connection)
     connection.close()
     return jsonify([m.__dict__ for m in mietvertraege])
 
@@ -89,7 +89,7 @@ def get_all_mietvertraege():
 @requires_auth
 def get_mietvertrag(mietvertrag_id):
     connection = get_db_connection()
-    mietvertrag = Mietvertrag.read(connection, mietvertrag_id)
+    mietvertrag = MietVorgang.read(connection, mietvertrag_id)
     connection.close()
     if mietvertrag:
         return jsonify(mietvertrag.__dict__)
@@ -119,4 +119,4 @@ def get_mitarbeiter(mitarbeiter_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
