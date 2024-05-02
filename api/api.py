@@ -51,6 +51,7 @@ def requires_auth(f):
         if not user:
             return jsonify({'error': 'Unauthorized access'}), 401
         return f(*args, **kwargs)
+
     return decorated
 
 def requires_write(f):
