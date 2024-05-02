@@ -10,7 +10,7 @@ class MietObjekt:
         self.Kraftstoff = Kraftstoff
 
     @staticmethod
-    def create(connection, Bauart: Bauart, Kennzeichen: str, Baujahr: str, Kraftstoff: str, LetzteInspektion: datetime):
+    def create(connection, Bauart, Kennzeichen: str, Baujahr: str, Kraftstoff: str, LetzteInspektion):
         cursor = connection.cursor()
         sql = "INSERT INTO Mietobjekt (BauartID, Kennzeichen, Baujahr, Kraftstoff, LetzteInspektion) VALUES (%s, %s, %s, %s, %s)"
         val = (Bauart.BauartId, Kennzeichen, Baujahr, Kraftstoff, LetzteInspektion)

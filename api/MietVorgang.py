@@ -1,8 +1,7 @@
 import mysql.connector
 
 class MietVorgang:
-    def __init__(self, VorgangId, ObjektId, MitarbeiterID, Mietzeitraum, Kilometerstand_vorher,
-                 Kilometerstand_nachher, Gefahrene_Kilmeter, Mietzeit_tage, Mietzeit_zeit, miet_ende):
+    def __init__(self, VorgangId, ObjektId, MitarbeiterID, KilometerstandVorher, KilometerstandNacher, GefahreneKilometer, MieteStart, MieteEnde):
         self.VorgangId = VorgangId
         self.ObjektId = ObjektId
         self.MitarbeiterID = MitarbeiterID
@@ -50,7 +49,7 @@ class MietVorgang:
     @staticmethod
     def get_all(connection):
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM MietVorgang")
+        cursor.execute("SELECT VorgangId, ObjektId, MitarbeiterID, KmStandVorher, KmStandNachher, GefahreneKm, MieteStart, MieteEnde FROM MietVorgang")
         results = cursor.fetchall()
         mietvertraege = []
         for row in results:

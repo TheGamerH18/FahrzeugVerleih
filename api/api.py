@@ -3,7 +3,6 @@ import os
 from flask import Flask, request, jsonify
 from functools import wraps
 from MietObjekt import MietObjekt
-from Inspektion import Inspektion
 from MietVorgang import MietVorgang
 from Mitarbeiter import Mitarbeiter
 import mysql.connector
@@ -37,46 +36,25 @@ def requires_auth(f):
         return f(*args, **kwargs)
     return decorated
 
-@app.route('/fahrzeuge', methods=['GET'])
+@app.route('/objekte', methods=['GET'])
 @requires_auth
 def get_all_fahrzeuge():
     connection = get_db_connection()
-    fahrzeuge = MietObjekt.get_all(connection)
+    objekte = MietObjekt.get_all(connection)
     connection.close()
-    return jsonify([f.__dict__ for f in fahrzeuge])
+    return jsonify([f.__dict__ for f in objekte])
 
 
-@app.route('/fahrzeuge/<int:fahrzeug_id>', methods=['GET'])
+@app.route('/objekte/<int:objekt_id>', methods=['GET'])
 @requires_auth
-def get_fahrzeug(fahrzeug_id):
+def get_fahrzeug(objekt_id):
     connection = get_db_connection()
-    fahrzeug = MietObjekt.read(connection, fahrzeug_id)
+    objekt = MietObjekt.read(connection, objekt_id)
     connection.close()
-    if fahrzeug:
-        return jsonify(fahrzeug.__dict__)
+    if objekt:
+        return jsonify(objekt.__dict__)
     else:
         return jsonify({'error': 'Fahrzeug not found'}), 404
-
-
-@app.route('/inspektionen', methods=['GET'])
-@requires_auth
-def get_all_inspektionen():
-    connection = get_db_connection()
-    inspektionen = Inspektion.get_all(connection)
-    connection.close()
-    return jsonify([i.__dict__ for i in inspektionen])
-
-
-@app.route('/inspektionen/<int:inspektion_id>', methods=['GET'])
-@requires_auth
-def get_inspektion(inspektion_id):
-    connection = get_db_connection()
-    inspektion = Inspektion.read(connection, inspektion_id)
-    connection.close()
-    if inspektion:
-        return jsonify(inspektion.__dict__)
-    else:
-        return jsonify({'error': 'Inspektion not found'}), 404
 
 
 @app.route('/mietvertraege', methods=['GET'])
