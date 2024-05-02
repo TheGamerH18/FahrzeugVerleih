@@ -34,7 +34,9 @@ def requires_auth(f):
         if not api_key or api_key != API_KEY:
             return jsonify({'error': 'Unauthorized access'}), 401
         return f(*args, **kwargs)
+
     return decorated
+
 
 @app.route('/objekte', methods=['GET'])
 @requires_auth
