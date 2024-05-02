@@ -8,6 +8,15 @@ CREATE TABLE IF NOT EXISTS Bauart (
     PRIMARY KEY (BauartID)
 );
 
+CREATE TABLE IF NOT EXISTS Users(
+    UserId INT NOT NULL AUTO_INCREMENT,
+    UserName VARCHAR(255),
+    Password VARCHAR(255),
+    CanWrite BOOL,
+    IsAdmin BOOL,
+    PRIMARY KEY (UserId)
+);
+
 CREATE TABLE IF NOT EXISTS Mietobjekt (
     ObjektID INT NOT NULL AUTO_INCREMENT,
     BauartID INT,
@@ -39,6 +48,11 @@ CREATE TABLE IF NOT EXISTS Mietvorgang (
     FOREIGN KEY (MitarbeiterID) REFERENCES Mitarbeiter(MitarbeiterID) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (ObjektID) REFERENCES Mietobjekt(ObjektID) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+INSERT INTO Users
+    (UserName, Password, CanWrite, IsAdmin)
+VALUES
+    ('root', 'root', TRUE, TRUE);
 
 INSERT INTO mitarbeiter
     (Vorname, Nachname)

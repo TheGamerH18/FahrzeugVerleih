@@ -7,6 +7,15 @@ class Bauart:
         self.Modell = Modell
         self.Bauform = Bauform
 
+    def get_dict(self):
+        dicts = {
+            'BauartId': self.BauartId,
+            'Marke': self.Marke,
+            'Modell': self.Modell,
+            'Bauform': self.Bauform
+        }
+        return dicts
+
     def update(self, connection):
         cursor = connection.cursor()
         sql = "UPDATE Bauart SET Marke = %s, Modell = %s, Bauform = %s WHERE BauartId = %s"
@@ -42,10 +51,10 @@ class Bauart:
         return bauarten
 
     @staticmethod
-    def read(connection, bauart_id):
+    def get(connection: mysql.connector.MySQLConnection, bauart_id: int):
         cursor = connection.cursor()
-        sql = ("SELECT * FROM Bauart WHERE BauartId = %s", (bauart_id,))
-        value = bauart_id
+        sql = "SELECT * FROM Bauart WHERE BauartId = %s"
+        value = tuple([bauart_id])
         cursor.execute(sql, value)
         dbresult = cursor.fetchone()
         if dbresult:

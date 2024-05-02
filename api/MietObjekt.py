@@ -1,19 +1,36 @@
+from datetime import datetime
+
+from mysql.connector.abstracts import MySQLConnectionAbstract
+from mysql.connector.pooling import PooledMySQLConnection
+
 import mysql.connector
+from Bauart import Bauart
 
 class MietObjekt:
-    def __init__(self, ObjektId: int, BauartId: int, Kennzeichen: str, Baujahr: str, Kraftstoff: str, LetzteInspektion):
+    def __init__(self, ObjektId: int, bauart, Kennzeichen: str, Baujahr: str, Kraftstoff: str, LetzteInspektion: datetime):
         self.LetzteInspektion = LetzteInspektion
         self.ObjektId = ObjektId
-        self.BauartId = BauartId
+        self.Bauart = bauart
         self.Kennzeichen = Kennzeichen
         self.Baujahr = Baujahr
         self.Kraftstoff = Kraftstoff
 
+    def get_dict(self):
+        dicts = {
+            'ObjektId': self.ObjektId,
+            'Bauart': self.Bauart.get_dict(),
+            'Kennzeichen': self.Kennzeichen,
+            'LetzteInspektion': str(self.LetzteInspektion),
+            'Kraftstoff': self.Kraftstoff,
+            'Baujahr': self.Baujahr
+        }
+        return dicts
+
     @staticmethod
-    def create(connection, Bauart, Kennzeichen: str, Baujahr: str, Kraftstoff: str, LetzteInspektion):
+    def create(connection, bauart, Kennzeichen: str, Baujahr: str, Kraftstoff: str, LetzteInspektion):
         cursor = connection.cursor()
         sql = "INSERT INTO Mietobjekt (BauartID, Kennzeichen, Baujahr, Kraftstoff, LetzteInspektion) VALUES (%s, %s, %s, %s, %s)"
-        val = (Bauart.BauartId, Kennzeichen, Baujahr, Kraftstoff, LetzteInspektion)
+        val = (bauart.BauartId, Kennzeichen, Baujahr, Kraftstoff, LetzteInspektion)
         cursor.execute(sql, val)
         connection.commit()
         return cursor.lastrowid
@@ -25,25 +42,30 @@ class MietObjekt:
         results = cursor.fetchall()
         mietobjekte = []
         for row in results:
-            fahrzeug = MietObjekt(*row)
+            bauart = Bauart.get(connection, row[1])
+            li = list(row)
+            li[1] = bauart
+            fahrzeug = MietObjekt(*li)
             mietobjekte.append(fahrzeug)
         return mietobjekte
 
     @staticmethod
-    def read(connection, objekt_id):
+    def read(connection: PooledMySQLConnection | MySQLConnectionAbstract, objekt_id: int):
         cursor = connection.cursor()
         sql = "SELECT * FROM Mietobjekt WHERE ObjektID = %s"
-        val = objekt_id
+        val = tuple([objekt_id])
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:
+            bauart = Bauart.get(connection, row[1])
+            row[1] = bauart
             return MietObjekt(*result)
         else:
             return None
 
-    def update(self, connection):
+    def update(self, connection: mysql.connector.MySQLConnection):
         cursor = connection.cursor()
-        sql = "UPDATE Mietobjekt SET BauartID = %s, Kennzeichen = %s, Baujahr = %s, Kraftstoff = %s, LetzteInspektion = %s WHERE FahrzeugID = %s"
+        sql = "UPDATE Mietobjekt SET BauartID = %s, Kennzeichen = %s, Baujahr = %s, Kraftstoff = %s, LetzteInspektion = %s WHERE ObjektID = %s"
         val = (self.BauartId, self.Kennzeichen, self.Baujahr, self.Kraftstoff, self.LetzteInspektion, self.ObjektId)
         cursor.execute(sql, val)
         connection.commit()
