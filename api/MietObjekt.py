@@ -55,10 +55,10 @@ class MietObjekt:
         sql = "SELECT * FROM Mietobjekt WHERE ObjektID = %s"
         val = tuple([objekt_id])
         cursor.execute(sql, val)
-        result = cursor.fetchone()
+        result = list(cursor.fetchone())
         if result:
-            bauart = Bauart.get(connection, row[1])
-            row[1] = bauart
+            bauart = Bauart.get(connection, result[1])
+            result[1] = bauart
             return MietObjekt(*result)
         else:
             return None

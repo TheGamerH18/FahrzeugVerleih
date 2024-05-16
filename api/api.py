@@ -1,6 +1,7 @@
 import os
+from typing import Tuple
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, wrappers, Response
 from functools import wraps
 
 from mysql.connector.abstracts import MySQLConnectionAbstract
@@ -72,7 +73,7 @@ def get_all_fahrzeuge():
 
 @app.route('/objekte/<int:objekt_id>', methods=['GET'])
 @requires_auth
-def get_fahrzeug(objekt_id):
+def get_fahrzeug(objekt_id: int) -> Response | tuple[Response, int] :
     connection = get_db_connection()
     objekt = MietObjekt.get(connection, objekt_id)
     connection.close()
