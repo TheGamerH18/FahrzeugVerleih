@@ -31,23 +31,12 @@ db_config = {
 def get_db_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
     return mysql.connector.connect(**db_config)
 
-def get_user(username: str, password: str) -> User:
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    sql = 'SELECT * FROM users WHERE UserName = %s AND Password = %s'
-    val = (username, password)
-    cursor.execute(sql, val)
-    row = cursor.fetchone()
-    return User.load(*row)
-
 
 # Authentication decorator
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        username = request.args.get('USERNAME')
-        password = request.args.get('PASSWORD')
-        user = get_user(username, password)
+        user = User.get(get_db_connection(), request.args.get('USERNAME'), request.args.get('PASSWORD'))
         if not user:
             return jsonify({'error': 'Unauthorized access'}), 401
         return f(*args, **kwargs)
@@ -57,9 +46,7 @@ def requires_auth(f):
 def requires_write(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        username = request.args.get('USERNAME')
-        password = request.args.get('PASSWORD')
-        user = get_user(username, password)
+        user = User.get(get_db_connection(), request.args.get('USERNAME'), request.args.get('PASSWORD'))
         if not user or not user.CanWrite:
             return jsonify({'error' : 'Unauthorized access'}), 401
         return f(*args, **kwargs)
@@ -68,9 +55,7 @@ def requires_write(f):
 def requires_admin(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        username = request.args.get('USERNAME')
-        password = request.args.get('PASSWORD')
-        user = get_user(username, password)
+        user = User.get(get_db_connection(), request.args.get('USERNAME'), request.args.get('PASSWORD'))
         if not user or not user.IsAdmin:
             return jsonify({'error' : 'Unauthorized access'}), 401
         return f(*args, **kwargs)
@@ -89,10 +74,10 @@ def get_all_fahrzeuge():
 @requires_auth
 def get_fahrzeug(objekt_id):
     connection = get_db_connection()
-    objekt = MietObjekt.read(connection, objekt_id)
+    objekt = MietObjekt.get(connection, objekt_id)
     connection.close()
     if objekt:
-        return jsonify(objekt.__dict__)
+        return jsonify(objekt.get_dict())
     else:
         return jsonify({'error': 'Fahrzeug not found'}), 404
 

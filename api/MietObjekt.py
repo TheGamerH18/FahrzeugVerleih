@@ -50,7 +50,7 @@ class MietObjekt:
         return mietobjekte
 
     @staticmethod
-    def read(connection: PooledMySQLConnection | MySQLConnectionAbstract, objekt_id: int):
+    def get(connection: PooledMySQLConnection | MySQLConnectionAbstract, objekt_id: int):
         cursor = connection.cursor()
         sql = "SELECT * FROM Mietobjekt WHERE ObjektID = %s"
         val = tuple([objekt_id])

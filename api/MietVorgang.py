@@ -1,15 +1,19 @@
 import mysql.connector
+from datetime import datetime
+
+from MietObjekt import MietObjekt
 
 class MietVorgang:
-    def __init__(self, VorgangId, ObjektId, MitarbeiterID, KilometerstandVorher, KilometerstandNacher, GefahreneKilometer, MieteStart, MieteEnde):
+    def __init__(self, VorgangId: int, objekt: MietObjekt, MitarbeiterID, KilometerstandVorher: int, KilometerstandNacher: int, GefahreneKilometer: int, MieteStart: datetime, MieteEnde: datetime):
         self.VorgangId = VorgangId
-        self.ObjektId = ObjektId
+        self.Objekt = objekt
         self.MitarbeiterID = MitarbeiterID
         self.KmStandVorher = KilometerstandVorher
         self.KmStandNachher = KilometerstandNacher
         self.Gefahrene_Kilometer = GefahreneKilometer
         self.MieteStart = MieteStart
         self.MieteEnde = MieteEnde
+
 
     @staticmethod
     def create(connection, ObjektId, MitarbeiterID, KmStandVorher, KmStandNachher, GefahreneKilometer, MieteStart, MieteEnde):
@@ -35,7 +39,7 @@ class MietVorgang:
     def update(self, connection):
         cursor = connection.cursor()
         sql = "UPDATE MietVorgang SET ObjektID = %s, MitarbeiterID = %s, KmStandVorher = %s, KmStandNachher = %s, GefahreneKm = %s, MieteStart = %s, MieteEnde = %s WHERE VorgangID = %s"
-        val = (self.ObjektId, self.MitarbeiterID, self.KmStandVorher, self.KmStandNachher, self.Gefahrene_Kilometer, self.MieteStart, self.MieteEnde, self.VorgangId)
+        val = (self.Objekt, self.MitarbeiterID, self.KmStandVorher, self.KmStandNachher, self.Gefahrene_Kilometer, self.MieteStart, self.MieteEnde, self.VorgangId)
         cursor.execute(sql, val)
         connection.commit()
 
@@ -53,6 +57,8 @@ class MietVorgang:
         results = cursor.fetchall()
         mietvertraege = []
         for row in results:
+            li = list(row)
+            
             mietvertrag = MietVorgang(*row)
             mietvertraege.append(mietvertrag)
         return mietvertraege
