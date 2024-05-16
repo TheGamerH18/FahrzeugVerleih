@@ -2,18 +2,38 @@ import mysql.connector
 from datetime import datetime
 
 from MietObjekt import MietObjekt
+from Mitarbeiter import Mitarbeiter
 
 class MietVorgang:
-    def __init__(self, VorgangId: int, objekt: MietObjekt, MitarbeiterID, KilometerstandVorher: int, KilometerstandNacher: int, GefahreneKilometer: int, MieteStart: datetime, MieteEnde: datetime):
+    def __init__(self, VorgangId: int,
+                 KilometerstandVorher: int,
+                 KilometerstandNacher: int,
+                 GefahreneKilometer: int,
+                 MieteStart: datetime,
+                 MieteEnde: datetime,
+                 arbeiter: Mitarbeiter,
+                 objekt: MietObjekt):
         self.VorgangId = VorgangId
         self.Objekt = objekt
-        self.MitarbeiterID = MitarbeiterID
+        self.Mitarbeiter = arbeiter
         self.KmStandVorher = KilometerstandVorher
         self.KmStandNachher = KilometerstandNacher
         self.Gefahrene_Kilometer = GefahreneKilometer
         self.MieteStart = MieteStart
         self.MieteEnde = MieteEnde
 
+    def get_dict(self):
+        dicts = {
+            "VorgangId": self.VorgangId,
+            "Objekt": self.Objekt.get_dict(),
+            "Mitarbeiter": self.Mitarbeiter.get_dict(),
+            "KmStandVorher": self.KmStandVorher,
+            "KmStandNachher": self.KmStandNachher,
+            "GefahreneKm": self.Gefahrene_Kilometer,
+            "MieteStart": self.MieteStart,
+            "MieteEnde": self.MieteEnde
+        }
+        return dicts
 
     @staticmethod
     def create(connection, ObjektId, MitarbeiterID, KmStandVorher, KmStandNachher, GefahreneKilometer, MieteStart, MieteEnde):
@@ -28,10 +48,13 @@ class MietVorgang:
     def read(connection, MietVorgangId):
         cursor = connection.cursor()
         sql = "SELECT * FROM MietVorgang WHERE VorgangID = %s"
-        val = MietVorgangId
+        val = [MietVorgangId]
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:
+            result = list(result)
+            result[7] = MietObjekt.get(connection, result[7])
+            result[6] = Mitarbeiter.read(connection, result[6])
             return MietVorgang(*result)
         else:
             return None
@@ -39,7 +62,7 @@ class MietVorgang:
     def update(self, connection):
         cursor = connection.cursor()
         sql = "UPDATE MietVorgang SET ObjektID = %s, MitarbeiterID = %s, KmStandVorher = %s, KmStandNachher = %s, GefahreneKm = %s, MieteStart = %s, MieteEnde = %s WHERE VorgangID = %s"
-        val = (self.Objekt, self.MitarbeiterID, self.KmStandVorher, self.KmStandNachher, self.Gefahrene_Kilometer, self.MieteStart, self.MieteEnde, self.VorgangId)
+        val = (self.Objekt, self.Mitarbeiter, self.KmStandVorher, self.KmStandNachher, self.Gefahrene_Kilometer, self.MieteStart, self.MieteEnde, self.VorgangId)
         cursor.execute(sql, val)
         connection.commit()
 

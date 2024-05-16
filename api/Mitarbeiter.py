@@ -7,6 +7,14 @@ class Mitarbeiter:
         self.Vorname = Vorname
         self.Nachname = Nachname
 
+    def get_dict(self):
+        dicts = {
+            "MitarbeiterID": self.MitarbeiterID,
+            "Vorname": self.Vorname,
+            "Nachname": self.Nachname
+        }
+        return dicts
+
     @staticmethod
     def create(connection, Vorname, Nachname):
         cursor = connection.cursor()
@@ -20,7 +28,7 @@ class Mitarbeiter:
     def read(connection, MitarbeiterID):
         cursor = connection.cursor()
         sql = "SELECT * FROM Mitarbeiter WHERE MitarbeiterID = %s"
-        val = MitarbeiterID
+        val = [MitarbeiterID]
         cursor.execute(sql, val)
         result = cursor.fetchone()
         if result:

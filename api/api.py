@@ -99,7 +99,7 @@ def get_mietvertrag(mietvertrag_id):
     mietvertrag = MietVorgang.read(connection, mietvertrag_id)
     connection.close()
     if mietvertrag:
-        return jsonify(mietvertrag.__dict__)
+        return jsonify(mietvertrag.get_dict())
     else:
         return jsonify({'error': 'Mietvertrag not found'}), 404
 
