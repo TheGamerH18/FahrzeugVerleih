@@ -1,4 +1,5 @@
-#CREATE DATABASE ausleihen_fahrzeuge;
+CREATE DATABASE ausleihen_fahrzeuge;
+USE ausleihen_fahrzeuge;
 
 CREATE TABLE IF NOT EXISTS Bauart (
     BauartID INT NOT NULL AUTO_INCREMENT,
@@ -8,13 +9,20 @@ CREATE TABLE IF NOT EXISTS Bauart (
     PRIMARY KEY (BauartID)
 );
 
+CREATE TABLE IF NOT EXISTS Roles(
+    RoleId INT NOT NULL AUTO_INCREMENT,
+    RoleName VARCHAR(255),
+    PermissionLevel INT,
+    PRIMARY KEY (RoleId)
+);
+
 CREATE TABLE IF NOT EXISTS Users(
     UserId INT NOT NULL AUTO_INCREMENT,
     UserName VARCHAR(255),
     Password VARCHAR(255),
-    CanWrite BOOL,
-    IsAdmin BOOL,
-    PRIMARY KEY (UserId)
+    RoleId INT,
+    PRIMARY KEY (UserId),
+    FOREIGN KEY (RoleId) REFERENCES Roles(RoleId) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Mietobjekt (
@@ -49,10 +57,18 @@ CREATE TABLE IF NOT EXISTS Mietvorgang (
     FOREIGN KEY (ObjektID) REFERENCES Mietobjekt(ObjektID) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-INSERT INTO Users
-    (UserName, Password, CanWrite, IsAdmin)
+INSERT INTO Roles
+    (RoleName, PermissionLevel)
 VALUES
-    ('root', 'root', TRUE, TRUE);
+    ('admin', 0),
+    ('mitarbeiter', 1),
+    ('verwaltung', 2);
+
+INSERT INTO Users
+    (UserName, Password, RoleId)
+VALUES
+    ('root', 'root', 1);
+
 
 INSERT INTO mitarbeiter
     (Vorname, Nachname)

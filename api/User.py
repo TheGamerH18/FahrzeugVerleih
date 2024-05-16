@@ -3,12 +3,11 @@ from mysql.connector.pooling import PooledMySQLConnection
 
 
 class User:
-    def __init__(self, userId: str, username: str, password: str, canWrite: bool, isAdmin: bool):
+    def __init__(self, userId: int, username: str, password: str, role: Role):
         self.UserId = userId
         self.Username = username
         self.Password = password
-        self.CanWrite = canWrite
-        self.IsAdmin = isAdmin
+        self.Role = role
 
     @staticmethod
     def get(connection: PooledMySQLConnection | MySQLConnectionAbstract, username: str, password: str):
@@ -19,4 +18,18 @@ class User:
         row = cursor.fetchone()
         return User(*row)
 
+
+class Role:
+    def __init__(self, roleId: int, roleName: str, permissionLevel: int):
+        self.RoleId = roleId
+        self.RoleName = roleName
+        self.PermissionLevel = permissionLevel
+
+    def get(self, connection, roleId):
+        cursor = connection.cursor()
+        sql = 'SELECT * FROM roles WHERE RoleId = %s'
+        val = [roleId]
+        cursor.execute(sql, val)
+        row = cursor.fetchone()
+        return Role(*row)
 
