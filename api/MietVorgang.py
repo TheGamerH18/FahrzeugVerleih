@@ -76,12 +76,13 @@ class MietVorgang:
     @staticmethod
     def get_all(connection):
         cursor = connection.cursor()
-        cursor.execute("SELECT VorgangId, ObjektId, MitarbeiterID, KmStandVorher, KmStandNachher, GefahreneKm, MieteStart, MieteEnde FROM MietVorgang")
+        cursor.execute("SELECT * FROM MietVorgang")
         results = cursor.fetchall()
         mietvertraege = []
         for row in results:
-            li = list(row)
-            
+            row = list(row)
+            row[7] = MietObjekt.get(connection, row[7])
+            row[6] = Mitarbeiter.read(connection, row[6])
             mietvertrag = MietVorgang(*row)
             mietvertraege.append(mietvertrag)
         return mietvertraege

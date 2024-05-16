@@ -89,7 +89,7 @@ def get_all_mietvertraege():
     connection = get_db_connection()
     mietvertraege = MietVorgang.get_all(connection)
     connection.close()
-    return jsonify([m.__dict__ for m in mietvertraege])
+    return jsonify([m.get_dict() for m in mietvertraege])
 
 
 @app.route('/mietvertraege/<int:mietvertrag_id>', methods=['GET'])
@@ -110,7 +110,7 @@ def get_all_mitarbeiter():
     connection = get_db_connection()
     mitarbeiter = Mitarbeiter.get_all(connection)
     connection.close()
-    return jsonify([m.__dict__ for m in mitarbeiter])
+    return jsonify([m.get_dict() for m in mitarbeiter])
 
 
 @app.route('/mitarbeiter/<int:mitarbeiter_id>', methods=['GET'])
@@ -120,7 +120,7 @@ def get_mitarbeiter(mitarbeiter_id):
     mitarbeiter = Mitarbeiter.read(connection, mitarbeiter_id)
     connection.close()
     if mitarbeiter:
-        return jsonify(mitarbeiter.__dict__)
+        return jsonify(mitarbeiter.get_dict())
     else:
         return jsonify({'error': 'Mitarbeiter not found'}), 404
 
