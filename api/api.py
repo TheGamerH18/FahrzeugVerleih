@@ -2,7 +2,7 @@ import os
 from typing import Tuple
 
 from flask import Flask, request, jsonify, wrappers, Response
-from functools import wraps
+from functools import wraps, partial
 
 from mysql.connector.abstracts import MySQLConnectionAbstract
 from mysql.connector.pooling import PooledMySQLConnection
@@ -34,36 +34,18 @@ def get_db_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
 
 
 # Authentication decorator
-def requires_auth(f):
+def requires_auth(f, argument):
     @wraps(f)
     def decorated(*args, **kwargs):
-        user = User.get(get_db_connection(), request.args.get('USERNAME'), request.args.get('PASSWORD'))
-        if not user:
+        user = User.get(get_db_connection(), request.args.get('USERNAME'))
+        if not user or user.Password != request.args.get('PASSWORD') or user.Level > argument:
             return jsonify({'error': 'Unauthorized access'}), 401
         return f(*args, **kwargs)
-
     return decorated
 
-def requires_write(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        user = User.get(get_db_connection(), request.args.get('USERNAME'), request.args.get('PASSWORD'))
-        if not user or not user.CanWrite:
-            return jsonify({'error' : 'Unauthorized access'}), 401
-        return f(*args, **kwargs)
-    return decorated
-
-def requires_admin(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        user = User.get(get_db_connection(), request.args.get('USERNAME'), request.args.get('PASSWORD'))
-        if not user or not user.IsAdmin:
-            return jsonify({'error' : 'Unauthorized access'}), 401
-        return f(*args, **kwargs)
-    return decorated
-
+#region objekte
 @app.route('/objekte', methods=['GET'])
-@requires_auth
+@partial(requires_auth, argument=1)
 def get_all_fahrzeuge():
     connection = get_db_connection()
     objekte = MietObjekt.get_all(connection)
@@ -72,7 +54,7 @@ def get_all_fahrzeuge():
 
 
 @app.route('/objekte/<int:objekt_id>', methods=['GET'])
-@requires_auth
+@partial(requires_auth, argument=1)
 def get_fahrzeug(objekt_id: int) -> Response | tuple[Response, int] :
     connection = get_db_connection()
     objekt = MietObjekt.get(connection, objekt_id)
@@ -81,10 +63,11 @@ def get_fahrzeug(objekt_id: int) -> Response | tuple[Response, int] :
         return jsonify(objekt.get_dict())
     else:
         return jsonify({'error': 'Fahrzeug not found'}), 404
+#endregion
 
-
+#region vetraege
 @app.route('/mietvertraege', methods=['GET'])
-@requires_auth
+@partial(requires_auth, argument=1)
 def get_all_mietvertraege():
     connection = get_db_connection()
     mietvertraege = MietVorgang.get_all(connection)
@@ -93,7 +76,7 @@ def get_all_mietvertraege():
 
 
 @app.route('/mietvertraege/<int:mietvertrag_id>', methods=['GET'])
-@requires_auth
+@partial(requires_auth, argument=1)
 def get_mietvertrag(mietvertrag_id):
     connection = get_db_connection()
     mietvertrag = MietVorgang.read(connection, mietvertrag_id)
@@ -102,10 +85,11 @@ def get_mietvertrag(mietvertrag_id):
         return jsonify(mietvertrag.get_dict())
     else:
         return jsonify({'error': 'Mietvertrag not found'}), 404
+#endregion
 
-
+#region mitarbeiter
 @app.route('/mitarbeiter', methods=['GET'])
-@requires_auth
+@partial(requires_auth, argument=1)
 def get_all_mitarbeiter():
     connection = get_db_connection()
     mitarbeiter = Mitarbeiter.get_all(connection)
@@ -114,7 +98,7 @@ def get_all_mitarbeiter():
 
 
 @app.route('/mitarbeiter/<int:mitarbeiter_id>', methods=['GET'])
-@requires_auth
+@partial(requires_auth, argument=1)
 def get_mitarbeiter(mitarbeiter_id):
     connection = get_db_connection()
     mitarbeiter = Mitarbeiter.read(connection, mitarbeiter_id)
@@ -123,7 +107,29 @@ def get_mitarbeiter(mitarbeiter_id):
         return jsonify(mitarbeiter.get_dict())
     else:
         return jsonify({'error': 'Mitarbeiter not found'}), 404
+#endregion
 
+#region user
+@app.route('/user', methods=['GET'])
+@partial(requires_auth, argument=0)
+def get_users():
+    connection = get_db_connection()
+    users = User.get_all(connection)
+    connection.close()
+    return jsonify([user.get_dict() for user in users])
+
+
+@app.route('/user/<user_id>', methods=['GET'])
+@partial(requires_auth, argument=0)
+def get_user(user_id):
+    connection = get_db_connection()
+    user = User.get(connection, user_id)
+    connection.close()
+    if user:
+        return jsonify(user.get_dict())
+    else:
+        return jsonify({'error': 'User not found'}), 404
+#endregion
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
