@@ -10,11 +10,10 @@ CREATE TABLE IF NOT EXISTS Bauart (
 );
 
 CREATE TABLE IF NOT EXISTS Users(
-    UserId INT NOT NULL AUTO_INCREMENT,
     UserName VARCHAR(255),
     Password VARCHAR(255),
     Level INT,
-    PRIMARY KEY (UserId)
+    PRIMARY KEY (UserName)
 );
 
 CREATE TABLE IF NOT EXISTS Mietobjekt (

@@ -1,6 +1,7 @@
 import os
 from typing import Tuple
 
+import flask
 from flask import Flask, request, jsonify, wrappers, Response
 from functools import wraps, partial
 
@@ -14,6 +15,7 @@ from User import User
 import mysql.connector
 from dotenv import load_dotenv
 import json
+import base64
 
 app = Flask(__name__)
 load_dotenv()
@@ -37,8 +39,10 @@ def get_db_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
 def requires_auth(f, argument):
     @wraps(f)
     def decorated(*args, **kwargs):
-        user = User.get(get_db_connection(), request.args.get('USERNAME'))
-        if not user or user.Password != request.args.get('PASSWORD') or user.Level > argument:
+        usernamepass = base64.b64decode(request.headers.get('Authorization').replace('Basic ', '')).decode('utf-8')
+        username,password = usernamepass.split(':')
+        user = User.get(get_db_connection(), username)
+        if not user or user.Password != password or user.Level > argument:
             return jsonify({'error': 'Unauthorized access'}), 401
         return f(*args, **kwargs)
     return decorated
@@ -129,6 +133,34 @@ def get_user(user_id):
         return jsonify(user.get_dict())
     else:
         return jsonify({'error': 'User not found'}), 404
+
+@app.route('/user', methods=['PUT'])
+def create_user():
+    try:
+        username = request.json.get('username')
+        password = request.json.get('password')
+        permissions = int(request.json.get('level'))
+    except TypeError:
+        return jsonify({'error': 'Invalid JSON'}), 400
+    user = User(username, password, permissions)
+    connection = get_db_connection()
+    user.create(connection)
+    connection.close()
+    return jsonify(user.get_dict())
+
+@app.route('/user', methods=['DELETE'])
+def delete_user():
+    try:
+        username = str(request.json.get('username'))
+    except TypeError:
+        return jsonify({'error': 'Invalid JSON'}), 400
+    connection = get_db_connection()
+    user = User.get(connection, username)
+    if user is None:
+        return jsonify({'error': 'User not found'}), 404
+    user.delete(connection)
+    connection.close()
+    return jsonify({"success": f'Deleted user {username}'})
 #endregion
 
 if __name__ == '__main__':
