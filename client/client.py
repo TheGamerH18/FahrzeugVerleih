@@ -1,3 +1,58 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QMainWindow
+from BauartenWidget import *
+
+class MenueWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        button_style = """
+                QPushButton {
+                    background-color: #4CAF50; 
+                    color: white;
+                    border-radius: 10px;
+                    font-size: 16px;
+                    padding: 10px;
+                }
+                QPushButton:hover {
+                    background-color: #45a049;
+                }
+                """
+
+        self.setWindowTitle("Menü")
+        self.showMaximized()
+
+        self.stacked_widget = QStackedWidget()
+
+        self.btnBauarten = QPushButton("Bauarten")
+        self.btnBauarten.clicked.connect(self.show_bauarten)
+        self.btnMietObjekte = QPushButton("MietObjekte")
+        self.btnMietVorgang = QPushButton("MietVorgang")
+        self.btnMitarbeiter = QPushButton("Mitarbeiter")
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.btnBauarten)
+        layout.addWidget(self.btnMietObjekte)
+        layout.addWidget(self.btnMietVorgang)
+        layout.addWidget(self.btnMitarbeiter)
+
+        for i in range(layout.count()):
+            layout.itemAt(i).widget().setStyleSheet(button_style)
+
+        self.setLayout(layout)
+
+    def show_bauarten(self):
+        self.bauarten_widget = BauartenWidget()
+        self.bauarten_widget.show()
+        widget.hide()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    widget = MenueWidget()
+    widget.show()
+    sys.exit(app.exec_())
 import os
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QDialog, QLabel
