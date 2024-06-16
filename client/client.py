@@ -172,14 +172,6 @@ class MainWindow(QMainWindow):
         self.objekte_window = ObjekteWindow()
         self.objekte_window.show()
 
-    def open_mietvertraege_window(self):
-        self.mietvertraege_window = MietvertraegeWindow()
-        self.mietvertraege_window.show()
-
-    def open_mitarbeiter_window(self):
-        self.mitarbeiter_window = MitarbeiterWindow()
-        self.mitarbeiter_window.show()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
