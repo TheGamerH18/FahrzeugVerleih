@@ -1,4 +1,4 @@
-from BauartenWidget import *
+from MietObjekt import *
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget, QMainWindow, QMessageBox, QLineEdit, QDialog
 
@@ -88,15 +88,13 @@ class MenueWidget(QWidget):
 
         self.stacked_widget = QStackedWidget()
 
-        self.btnBauarten = QPushButton("Bauarten")
-        self.btnBauarten.clicked.connect(self.show_bauarten)
-        self.btnMietObjekte = QPushButton("MietObjekte")
+        self.btnMietobjekt = QPushButton("Miet Objekt")
+        self.btnMietobjekt.clicked.connect(self.show_mietobjekt)
         self.btnMietVorgang = QPushButton("MietVorgang")
         self.btnMitarbeiter = QPushButton("Mitarbeiter")
 
         layout = QVBoxLayout()
-        layout.addWidget(self.btnBauarten)
-        layout.addWidget(self.btnMietObjekte)
+        layout.addWidget(self.btnMietobjekt)
         layout.addWidget(self.btnMietVorgang)
         layout.addWidget(self.btnMitarbeiter)
 
@@ -108,7 +106,7 @@ class MenueWidget(QWidget):
         dialog = LoginDialog()
         dialog.exec_()
 
-    def show_bauarten(self):
+    def show_mietobjekt(self):
         self.bauarten_widget = BauartenWidget()
         self.bauarten_widget.show()
         widget.hide()
