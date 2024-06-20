@@ -45,10 +45,23 @@ class LoginDialog(QDialog):
 
         self.setLayout(layout)
 
+    def test_connection(self):
+        request = requests.get('http://localhost:5000/mietvertraege', auth=Auth.getAuth())
+        if request.status_code != 200:
+            return False
+        else:
+            return True
+
     def login(self):
             Auth(self.tbxBenutzername.text(), self.tbxPasswort.text())
-            print(Auth.getAuth())
-            self.close()
+            if self.test_connection() == False:
+                messagebox = QMessageBox()
+                messagebox.setText('Falsche Beutzerdaten!')
+                messagebox.setWindowTitle('Idiot')
+                messagebox.setStandardButtons(QMessageBox.Ok)
+                messagebox.exec_()
+            else:
+                self.close()
 
 
 class MenueWidget(QWidget):
