@@ -12,7 +12,7 @@ class BauartenWidget(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Miet Objekt")
+        self.setWindowTitle("Miet Objekte")
         self.showMaximized()
         auth = Auth("root", "root")
         request = requests.get('http://localhost:5000/objekte', auth=auth.getAuth())

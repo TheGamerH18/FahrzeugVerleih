@@ -88,10 +88,10 @@ class MenueWidget(QWidget):
 
         self.stacked_widget = QStackedWidget()
 
-        self.btnMietobjekt = QPushButton("Miet Objekt")
+        self.btnMietobjekt = QPushButton("Miet Objekte")
         self.btnMietobjekt.clicked.connect(self.show_mietobjekt)
-        self.btnMietVorgang = QPushButton("MietVorgang")
-        self.btnMitarbeiter = QPushButton("Mitarbeiter")
+        self.btnMietVorgang = QPushButton("MietVorgange")
+        self.btnMitarbeiter = QPushButton("Mitarbeitere")
 
         layout = QVBoxLayout()
         layout.addWidget(self.btnMietobjekt)
