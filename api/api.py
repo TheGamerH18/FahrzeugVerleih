@@ -31,7 +31,7 @@ db_config = {
 }
 
 
-def get_db_connection() -> PooledMySQLConnection | MySQLConnectionAbstract:
+def get_db_connection() -> MySQLConnectionAbstract:
     return mysql.connector.connect(**db_config)
 
 
